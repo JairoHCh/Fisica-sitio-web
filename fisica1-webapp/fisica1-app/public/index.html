@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Física I — Portal del Estudiante</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;1,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+  <div id="particles-canvas"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">⚛</span>
+      <span class="brand-text">FÍSICA <span class="brand-accent">I</span></span>
+    </div>
+    <div class="nav-toggle" id="navToggle">
+      <span></span><span></span><span></span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#/" class="nav-link" data-page="home"><span class="nav-icon">◈</span>Inicio</a></li>
+      <li><a href="#/blog" class="nav-link" data-page="blog"><span class="nav-icon">✦</span>Blog</a></li>
+      <li><a href="#/lab" class="nav-link" data-page="lab"><span class="nav-icon">⚗</span>Laboratorio</a></li>
+      <li><a href="#/library" class="nav-link" data-page="library"><span class="nav-icon">◉</span>Biblioteca</a></li>
+      <li><a href="#/forum" class="nav-link" data-page="forum"><span class="nav-icon">❋</span>Foro</a></li>
+      <li><a href="#/calculator" class="nav-link" data-page="calculator"><span class="nav-icon">∑</span>Calculadora</a></li>
+      <li><a href="#/quiz" class="nav-link" data-page="quiz"><span class="nav-icon">◆</span>Quiz</a></li>
+      <li><a href="#/notes" class="nav-link" data-page="notes"><span class="nav-icon">✎</span>Notas</a></li>
+    </ul>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content" id="app">
+    <div class="page-loader">
+      <div class="loader-ring"></div>
+      <div class="loader-text">Cargando...</div>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/particles.js"></script>
+  <script src="/js/home.js"></script>
+  <script src="/js/blog.js"></script>
+  <script src="/js/lab.js"></script>
+  <script src="/js/library.js"></script>
+  <script src="/js/forum.js"></script>
+  <script src="/js/calculator.js"></script>
+  <script src="/js/quiz.js"></script>
+  <script src="/js/notes.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
