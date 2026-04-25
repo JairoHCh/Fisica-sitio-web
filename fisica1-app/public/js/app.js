@@ -7,6 +7,8 @@ const PAGES = {
   '/library':    { render: renderLibrary,     title: 'Biblioteca' },
   '/forum':      { render: renderForum,       title: 'Foro' },
   '/calculator': { render: renderCalculator,  title: 'Calculadora' },
+  '/converter':  { render: renderConverter,   title: 'Conversor' },
+  '/constants':  { render: renderConstants,   title: 'Constantes' },
   '/quiz':       { render: renderQuiz,        title: 'Quiz' },
   '/notes':      { render: renderNotes,       title: 'Notas' }
 };
@@ -49,6 +51,8 @@ async function navigate(path) {
     }
     // Post-render hooks
     if (path === '/calculator') setTimeout(initCalculators, 50);
+    if (path === '/converter') setTimeout(initConverter, 50);
+    if (path === '/quiz')      setTimeout(initQuizPage, 50);
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
@@ -89,6 +93,7 @@ document.querySelectorAll('.nav-link').forEach(link => {
 // ======= KEYBOARD SHORTCUTS =======
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
+  // Ctrl+K or / to search (future)
 });
 
 // ======= INIT =======
@@ -98,6 +103,6 @@ handleHashChange();
 window.addEventListener('scroll', () => {
   const nav = document.getElementById('navbar');
   nav.style.background = window.scrollY > 50
-    ? 'rgba(4,5,15,0.95)'
+    ? 'rgba(4,5,15,0.97)'
     : 'rgba(4,5,15,0.85)';
 });

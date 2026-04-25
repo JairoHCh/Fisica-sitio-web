@@ -12,6 +12,10 @@ const CHAPTERS = [
 ];
 
 function renderHome() {
+  const stats = getOverallStats();
+  const scores = getQuizScores();
+  const quizScoresList = Object.entries(scores).slice(0, 3);
+
   return `
     <div class="page-enter">
       <!-- HERO -->
@@ -25,52 +29,116 @@ function renderHome() {
         <div class="hero-actions">
           <button class="btn btn-primary" onclick="navigate('/lab')">⚗ Abrir Laboratorio</button>
           <button class="btn btn-ghost" onclick="navigate('/quiz')">◆ Tomar Quiz</button>
-          <button class="btn btn-ghost" onclick="navigate('/forum')">❋ Ir al Foro</button>
+          <button class="btn btn-ghost" onclick="navigate('/calculator')">∑ Calculadora</button>
         </div>
         <div class="hero-stats">
           <div class="stat-item"><div class="stat-num">9</div><div class="stat-label">Capítulos</div></div>
           <div class="stat-item"><div class="stat-num">56</div><div class="stat-label">Horas Teóricas</div></div>
-          <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Simulaciones</div></div>
-          <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">Módulos</div></div>
+          <div class="stat-item"><div class="stat-num">7</div><div class="stat-label">Simulaciones</div></div>
+          <div class="stat-item"><div class="stat-num">${stats.chapsDone}</div><div class="stat-label">Caps. Completados</div></div>
+        </div>
+      </div>
+
+      <!-- MY PROGRESS -->
+      <div class="cyber-divider"><span>mi progreso</span></div>
+      <div class="grid-2" style="margin-bottom:2rem;align-items:start">
+        <div id="progress-overview" class="card">
+          ${buildProgressHTML()}
+        </div>
+        <div class="card">
+          <div style="font-family:var(--font-display);font-size:.75rem;color:var(--cyan);margin-bottom:1rem;letter-spacing:.1em">ESTADÍSTICAS RÁPIDAS</div>
+          <div class="quick-stats-grid">
+            <div class="qstat">
+              <div class="qstat-val" style="color:var(--cyan)">${stats.chapsDone}/9</div>
+              <div class="qstat-lbl">Capítulos completados</div>
+            </div>
+            <div class="qstat">
+              <div class="qstat-val" style="color:var(--gold)">${stats.quizzesTaken}</div>
+              <div class="qstat-lbl">Quizzes realizados</div>
+            </div>
+            <div class="qstat">
+              <div class="qstat-val" style="color:${stats.avgScore>=70?'var(--green)':'var(--red)'}">${stats.avgScore || '—'}${stats.avgScore ? '%' : ''}</div>
+              <div class="qstat-lbl">Promedio en quizzes</div>
+            </div>
+            <div class="qstat">
+              <div class="qstat-val" style="color:var(--purple)">${stats.quizzesTaken >= 4 ? '🏆' : stats.chapsDone >= 5 ? '⭐' : '🔰'}</div>
+              <div class="qstat-lbl">Nivel actual</div>
+            </div>
+          </div>
+          ${quizScoresList.length ? `
+            <div style="margin-top:1rem">
+              <div style="font-size:.72rem;color:var(--text2);font-family:var(--font-mono);margin-bottom:.5rem">MEJORES RESULTADOS</div>
+              ${quizScoresList.map(([id, s]) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:.35rem 0;border-bottom:1px solid var(--border)">
+                  <span style="font-size:.8rem;color:var(--text)">${id.replace('cap','Cap. ')}</span>
+                  <span style="font-family:var(--font-mono);font-size:.8rem;color:${s.best>=70?'var(--green)':'var(--gold)'}">${s.best}%</span>
+                </div>`).join('')}
+            </div>` : `<div style="margin-top:1rem;font-size:.8rem;color:var(--text3);text-align:center">Toma un quiz para ver tus resultados aquí</div>`}
+          <button class="btn btn-primary btn-sm" style="width:100%;margin-top:1rem" onclick="navigate('/quiz')">◆ Ir a Quizzes</button>
         </div>
       </div>
 
       <!-- QUICK TOOLS -->
       <div class="cyber-divider"><span>acceso rápido</span></div>
       <div class="grid-4" style="margin-bottom:2rem">
-        <div class="card" style="cursor:pointer;text-align:center" onclick="navigate('/blog')">
-          <div style="font-size:2rem;margin-bottom:.5rem">✦</div>
+        <div class="card quick-tool-card" onclick="navigate('/blog')">
+          <div class="quick-tool-icon">✦</div>
           <div class="font-display" style="font-size:.8rem;color:var(--cyan)">BLOG</div>
           <div class="text-small text-muted mt-1">Artículos de física</div>
         </div>
-        <div class="card" style="cursor:pointer;text-align:center" onclick="navigate('/lab')">
-          <div style="font-size:2rem;margin-bottom:.5rem">⚗</div>
+        <div class="card quick-tool-card" onclick="navigate('/lab')">
+          <div class="quick-tool-icon">⚗</div>
           <div class="font-display" style="font-size:.8rem;color:var(--gold)">LABORATORIO</div>
-          <div class="text-small text-muted mt-1">Simulaciones físicas</div>
+          <div class="text-small text-muted mt-1">7 simulaciones</div>
         </div>
-        <div class="card" style="cursor:pointer;text-align:center" onclick="navigate('/calculator')">
-          <div style="font-size:2rem;margin-bottom:.5rem">∑</div>
+        <div class="card quick-tool-card" onclick="navigate('/calculator')">
+          <div class="quick-tool-icon">∑</div>
           <div class="font-display" style="font-size:.8rem;color:var(--purple)">CALCULADORA</div>
-          <div class="text-small text-muted mt-1">Fórmulas interactivas</div>
+          <div class="text-small text-muted mt-1">15 fórmulas</div>
         </div>
-        <div class="card" style="cursor:pointer;text-align:center" onclick="navigate('/notes')">
-          <div style="font-size:2rem;margin-bottom:.5rem">✎</div>
-          <div class="font-display" style="font-size:.8rem;color:var(--green)">NOTAS</div>
+        <div class="card quick-tool-card" onclick="navigate('/converter')">
+          <div class="quick-tool-icon">∿</div>
+          <div class="font-display" style="font-size:.8rem;color:var(--green)">CONVERSOR</div>
+          <div class="text-small text-muted mt-1">Unidades físicas</div>
+        </div>
+        <div class="card quick-tool-card" onclick="navigate('/constants')">
+          <div class="quick-tool-icon">Ω</div>
+          <div class="font-display" style="font-size:.8rem;color:var(--cyan)">CONSTANTES</div>
+          <div class="text-small text-muted mt-1">Tabla de referencia</div>
+        </div>
+        <div class="card quick-tool-card" onclick="navigate('/notes')">
+          <div class="quick-tool-icon">✎</div>
+          <div class="font-display" style="font-size:.8rem;color:var(--gold)">NOTAS</div>
           <div class="text-small text-muted mt-1">Tu bloc de apuntes</div>
+        </div>
+        <div class="card quick-tool-card" onclick="navigate('/forum')">
+          <div class="quick-tool-icon">❋</div>
+          <div class="font-display" style="font-size:.8rem;color:var(--purple)">FORO</div>
+          <div class="text-small text-muted mt-1">Dudas y discusión</div>
+        </div>
+        <div class="card quick-tool-card" onclick="navigate('/library')">
+          <div class="quick-tool-icon">◉</div>
+          <div class="font-display" style="font-size:.8rem;color:var(--green)">BIBLIOTECA</div>
+          <div class="text-small text-muted mt-1">Recursos y libros</div>
         </div>
       </div>
 
       <!-- CHAPTERS -->
       <div class="cyber-divider"><span>contenido del curso</span></div>
       <div class="grid-3" style="margin-bottom:2rem">
-        ${CHAPTERS.map(ch => `
-          <div class="chapter-card" style="border-left:3px solid ${ch.color}">
-            <div class="chapter-num" style="color:${ch.color}">CAPÍTULO ${ch.num}</div>
+        ${CHAPTERS.map(ch => {
+          const isDone = getProgress()[`cap${ch.num}`]?.done;
+          return `
+          <div class="chapter-card ${isDone ? 'chapter-done' : ''}" style="border-left:3px solid ${ch.color}" onclick="toggleChapterDone(${ch.num});this.classList.toggle('chapter-done')">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div class="chapter-num" style="color:${ch.color}">CAPÍTULO ${ch.num}</div>
+              <div class="chapter-done-badge" style="display:${isDone?'flex':'none'};background:${ch.color}20;color:${ch.color};font-size:.65rem;padding:.15rem .45rem;border-radius:20px;font-family:var(--font-mono)">✓ Completado</div>
+            </div>
             <div class="chapter-title">${ch.title}</div>
             <div class="chapter-hours">⏱ ${ch.hours} horas</div>
             <div class="chapter-topics">${ch.topics}</div>
-          </div>
-        `).join('')}
+          </div>`;
+        }).join('')}
       </div>
 
       <!-- FORMULA PREVIEW -->
@@ -84,9 +152,10 @@ function renderHome() {
           { name: "Conservación de Energía", f: "Ec + Ep = cte", color: "#ff6b6b" },
           { name: "Presión Hidrostática", f: "P = P₀ + ρ · g · h", color: "#00d4ff" }
         ].map(f => `
-          <div class="card">
+          <div class="card formula-card" onclick="navigate('/calculator')">
             <div style="font-size:.72rem;font-family:var(--font-mono);color:var(--text2);margin-bottom:.4rem">${f.name}</div>
-            <div style="font-size:1.1rem;font-family:var(--font-mono);color:${f.color};padding:.5rem;background:var(--bg2);border-radius:6px;text-align:center">${f.f}</div>
+            <div class="formula-display" style="color:${f.color}">${f.f}</div>
+            <div style="font-size:.65rem;color:var(--text3);margin-top:.4rem;font-family:var(--font-mono)">→ calcular</div>
           </div>
         `).join('')}
       </div>

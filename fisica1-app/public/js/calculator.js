@@ -91,6 +91,76 @@ const CALCULATORS = [
       'Presión total': `${(parseFloat(P0)+parseFloat(rho)*parseFloat(g)*parseFloat(h)).toFixed(2)} Pa`,
       'En atm': `${((parseFloat(P0)+parseFloat(rho)*parseFloat(g)*parseFloat(h))/101325).toFixed(4)} atm`
     })
+  },
+  // NEW CALCULATORS
+  {
+    id: 'impulso', name: 'Impulso y Cambio de Momento', chapter: 'Cap. 5',
+    formula: 'J = F·Δt = Δp = m·(vf - vi)',
+    inputs: [['Masa m', 'm', 'kg', 2], ['Vi', 'vi', 'm/s', 0], ['Vf', 'vf', 'm/s', 10], ['Tiempo Δt', 'dt', 's', 2]],
+    calc: ({m, vi, vf, dt}) => {
+      const dp = parseFloat(m)*(parseFloat(vf)-parseFloat(vi));
+      const F = dp/parseFloat(dt);
+      return { 'Impulso J': `${dp.toFixed(4)} N·s`, 'Fuerza media F': `${F.toFixed(4)} N`, 'Δp': `${dp.toFixed(4)} kg·m/s` };
+    }
+  },
+  {
+    id: 'colision_elastica', name: 'Colisión Elástica 1D', chapter: 'Cap. 5',
+    formula: 'v₁f = (m₁-m₂)v₁i/(m₁+m₂)  |  v₂f = 2m₁v₁i/(m₁+m₂)',
+    inputs: [['Masa 1 m₁', 'm1', 'kg', 2], ['Masa 2 m₂', 'm2', 'kg', 3], ['v₁ inicial', 'v1', 'm/s', 5], ['v₂ inicial', 'v2', 'm/s', 0]],
+    calc: ({m1, m2, v1, v2}) => {
+      const M1=parseFloat(m1), M2=parseFloat(m2), V1=parseFloat(v1), V2=parseFloat(v2);
+      const v1f = ((M1-M2)*V1 + 2*M2*V2)/(M1+M2);
+      const v2f = ((M2-M1)*V2 + 2*M1*V1)/(M1+M2);
+      const Ec_i = 0.5*M1*V1**2 + 0.5*M2*V2**2;
+      const Ec_f = 0.5*M1*v1f**2 + 0.5*M2*v2f**2;
+      return { 'v₁ final': `${v1f.toFixed(4)} m/s`, 'v₂ final': `${v2f.toFixed(4)} m/s`, 'Ec inicial': `${Ec_i.toFixed(4)} J`, 'Ec final': `${Ec_f.toFixed(4)} J` };
+    }
+  },
+  {
+    id: 'gravedad', name: 'Fuerza Gravitacional', chapter: 'Cap. 1',
+    formula: 'F = G·m₁·m₂ / r²',
+    inputs: [['Masa 1', 'm1', 'kg', 5.97e24], ['Masa 2', 'm2', 'kg', 70], ['Distancia r', 'r', 'm', 6.37e6]],
+    calc: ({m1, m2, r}) => {
+      const G = 6.674e-11;
+      const F = G*parseFloat(m1)*parseFloat(m2)/(parseFloat(r)**2);
+      return { 'Fuerza F': `${F.toExponential(4)} N` };
+    }
+  },
+  {
+    id: 'ondas', name: 'Velocidad de Onda', chapter: 'Cap. 8',
+    formula: 'v = λ·f  |  T = 1/f',
+    inputs: [['Longitud de onda λ', 'lambda', 'm', 2], ['Frecuencia f', 'f', 'Hz', 5]],
+    calc: ({lambda, f}) => {
+      const fv = parseFloat(f);
+      return {
+        'Velocidad v': `${(parseFloat(lambda)*fv).toFixed(4)} m/s`,
+        'Período T': `${(1/fv).toFixed(4)} s`,
+        'ω (rad/s)': `${(2*Math.PI*fv).toFixed(4)} rad/s`
+      };
+    }
+  },
+  {
+    id: 'rozamiento', name: 'Fuerza de Rozamiento', chapter: 'Cap. 3',
+    formula: 'Fr = μ·N = μ·m·g·cos(θ)',
+    inputs: [['Masa m', 'm', 'kg', 5], ['μ coef. rozamiento', 'mu', '', 0.3], ['Ángulo θ', 'theta', '°', 0], ['g', 'g', 'm/s²', 9.8]],
+    calc: ({m, mu, theta, g}) => {
+      const th = parseFloat(theta)*Math.PI/180;
+      const N = parseFloat(m)*parseFloat(g)*Math.cos(th);
+      const Fr = parseFloat(mu)*N;
+      const Fnet = parseFloat(m)*parseFloat(g)*Math.sin(th) - Fr;
+      const a = Fnet/parseFloat(m);
+      return { 'Normal N': `${N.toFixed(4)} N`, 'Rozamiento Fr': `${Fr.toFixed(4)} N`, 'Fuerza neta': `${Fnet.toFixed(4)} N`, 'Aceleración': `${a.toFixed(4)} m/s²` };
+    }
+  },
+  {
+    id: 'calor', name: 'Calor y Temperatura', chapter: 'Cap. 9',
+    formula: 'Q = m·c·ΔT',
+    inputs: [['Masa m', 'm', 'kg', 1], ['Calor específico c', 'c', 'J/(kg·K)', 4186], ['ΔT', 'dT', 'K', 10]],
+    calc: ({m, c, dT}) => ({
+      'Calor Q': `${(parseFloat(m)*parseFloat(c)*parseFloat(dT)).toFixed(2)} J`,
+      'En kJ': `${(parseFloat(m)*parseFloat(c)*parseFloat(dT)/1000).toFixed(4)} kJ`,
+      'En kcal': `${(parseFloat(m)*parseFloat(c)*parseFloat(dT)/4184).toFixed(4)} kcal`
+    })
   }
 ];
 
@@ -100,7 +170,7 @@ function renderCalculator() {
       <div class="section-header">
         <div>
           <h1 class="section-title">∑ <span>Calculadora</span> de Física</h1>
-          <div class="section-subtitle">${CALCULATORS.length} fórmulas interactivas</div>
+          <div class="section-subtitle">${CALCULATORS.length} fórmulas interactivas · Cap. 1–9</div>
         </div>
       </div>
       <div class="calc-grid">
