@@ -73,7 +73,7 @@ function buildProgressHTML() {
     'Dinámica del Punto', 'Conservación', 'Sistema de Partículas',
     'Fluidos', 'Vibraciones y Ondas', 'Termodinámica'
   ];
-  const capColors = ['#00d4ff','#a855f7','#ffd23f','#00ff88','#ff6b6b','#00d4ff','#a855f7','#ffd23f','#00ff88'];
+  const capColors = ['#3b82f6','#8b5cf6','#d97706','#22c55e','#ef4444','#0ea5e9','#6366f1','#ec4899','#f97316'];
 
   return `
     <div class="progress-overview">
@@ -84,14 +84,14 @@ function buildProgressHTML() {
         </div>
         <div class="progress-ring-wrap">
           <svg width="70" height="70" viewBox="0 0 70 70">
-            <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(0,212,255,0.1)" stroke-width="6"/>
-            <circle cx="35" cy="35" r="28" fill="none" stroke="var(--cyan)" stroke-width="6"
-              stroke-dasharray="${2 * Math.PI * 28}"
-              stroke-dashoffset="${2 * Math.PI * 28 * (1 - pct / 100)}"
+            <circle cx="35" cy="35" r="28" fill="none" stroke="var(--border2)" stroke-width="5"/>
+            <circle cx="35" cy="35" r="28" fill="none" stroke="var(--cyan)" stroke-width="5"
+              stroke-dasharray="${(2 * Math.PI * 28).toFixed(1)}"
+              stroke-dashoffset="${(2 * Math.PI * 28 * (1 - pct / 100)).toFixed(1)}"
               stroke-linecap="round"
               transform="rotate(-90 35 35)"
-              style="transition:stroke-dashoffset 1s ease"/>
-            <text x="35" y="39" text-anchor="middle" fill="var(--cyan)" font-family="Orbitron" font-size="12" font-weight="700">${done}/${totalChaps}</text>
+              style="transition:stroke-dashoffset 0.8s ease"/>
+            <text x="35" y="39" text-anchor="middle" fill="var(--text)" font-family="Inter,sans-serif" font-size="12" font-weight="700">${done}/${totalChaps}</text>
           </svg>
         </div>
       </div>

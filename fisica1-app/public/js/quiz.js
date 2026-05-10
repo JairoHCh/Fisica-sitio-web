@@ -9,7 +9,7 @@ async function renderQuiz() {
   const quizzes = await API.get('/quiz');
   const scores = getQuizScores();
   const icons = { cap1:'⚛', cap2:'🚀', cap3:'⚖', cap4:'🎯', cap5:'⚡', cap7:'💧', cap8:'🌊', cap9:'🌡' };
-  const chapterColors = { cap1:'#00d4ff', cap2:'#a855f7', cap3:'#ffd23f', cap4:'#00ff88', cap5:'#ff6b6b', cap7:'#a855f7', cap8:'#ffd23f', cap9:'#00ff88' };
+  const chapterColors = { cap1:'#3b82f6', cap2:'#8b5cf6', cap3:'#d97706', cap4:'#22c55e', cap5:'#ef4444', cap7:'#6366f1', cap8:'#ec4899', cap9:'#f97316' };
 
   return `
     <div class="page-enter">

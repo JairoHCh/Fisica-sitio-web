@@ -14,46 +14,43 @@ const PAGES = {
 };
 
 async function navigate(path) {
-  // Stop any running sim
+  // Stop any running simulation
   if (typeof simAnimId !== 'undefined' && simAnimId) {
     cancelAnimationFrame(simAnimId);
     simAnimId = null;
   }
 
   const page = PAGES[path] || PAGES['/'];
-  const app = document.getElementById('app');
+  const app  = document.getElementById('app');
 
-  // Update URL hash
   window.location.hash = path === '/' ? '' : path;
 
-  // Active nav link
+  // Update active nav link
   document.querySelectorAll('.nav-link').forEach(link => {
     const lp = link.dataset.page;
-    const active = (path === '/' || path === '/home') ? lp === 'home'
+    const active = (path === '/' || path === '/home')
+      ? lp === 'home'
       : path.includes(lp) && lp !== 'home';
     link.classList.toggle('active', active);
   });
 
-  // Show loader
+  // Loading state
   app.innerHTML = `
     <div class="page-loader">
       <div class="loader-ring"></div>
-      <div class="loader-text">CARGANDO ${page.title.toUpperCase()}...</div>
+      <div class="loader-text">cargando ${page.title.toLowerCase()}...</div>
     </div>`;
 
-  // Close nav on mobile
   document.getElementById('navLinks').classList.remove('open');
 
   try {
     const html = await page.render();
-    if (typeof html === 'string') {
-      app.innerHTML = html;
-    }
-    // Post-render hooks
+    if (typeof html === 'string') app.innerHTML = html;
+
     if (path === '/calculator') setTimeout(initCalculators, 50);
-    if (path === '/converter') setTimeout(initConverter, 50);
-    if (path === '/quiz')      setTimeout(initQuizPage, 50);
-    // Scroll to top
+    if (path === '/converter')  setTimeout(initConverter, 50);
+    if (path === '/quiz')       setTimeout(initQuizPage, 50);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
     console.error('Navigation error:', err);
@@ -61,12 +58,12 @@ async function navigate(path) {
       <div class="empty-state">
         <div class="empty-icon">⚠</div>
         <div class="empty-text">Error al cargar la página</div>
-        <div class="empty-sub" style="font-family:var(--font-mono);color:var(--red)">${err.message}</div>
+        <div class="empty-sub" style="font-family:var(--font-mono);color:var(--red);font-size:.8rem">${err.message}</div>
         <button class="btn btn-ghost mt-2" onclick="navigate('/')">← Volver al inicio</button>
       </div>`;
   }
 
-  document.title = `${page.title} · Física I`;
+  document.title = `${page.title} · Física I — UNI`;
 }
 
 // ======= HASH ROUTER =======
@@ -74,10 +71,9 @@ function handleHashChange() {
   const hash = window.location.hash.replace('#', '') || '/';
   navigate(hash);
 }
-
 window.addEventListener('hashchange', handleHashChange);
 
-// ======= NAV TOGGLE (MOBILE) =======
+// ======= MOBILE NAV TOGGLE =======
 document.getElementById('navToggle').addEventListener('click', () => {
   document.getElementById('navLinks').classList.toggle('open');
 });
@@ -90,19 +86,69 @@ document.querySelectorAll('.nav-link').forEach(link => {
   });
 });
 
+// ======= DARK / LIGHT THEME TOGGLE =======
+const THEME_KEY = 'fisica1-theme';
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = theme === 'dark' ? '☀' : '🌙';
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// Load saved theme
+(function() {
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(saved);
+})();
+
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
 // ======= KEYBOARD SHORTCUTS =======
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
-  // Ctrl+K or / to search (future)
-});
+  // Escape → close modal / close mobile nav
+  if (e.key === 'Escape') {
+    closeModal();
+    document.getElementById('navLinks').classList.remove('open');
+  }
 
-// ======= INIT =======
-handleHashChange();
+  // Ctrl+D → toggle dark mode
+  if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+    e.preventDefault();
+    toggleTheme();
+  }
+
+  // Skip if inside an input
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+  // Number keys 1-9 → navigate to chapter quiz
+  if (!e.ctrlKey && !e.metaKey && !e.altKey && /^[1-9]$/.test(e.key)) {
+    navigate('/quiz');
+  }
+
+  // Shortcuts: h=home, b=blog, l=lab, f=forum, c=calculator, q=quiz, n=notes
+  const shortcuts = { h:'/', b:'/blog', l:'/lab', f:'/forum', c:'/calculator', q:'/quiz', n:'/notes', r:'/library' };
+  if (!e.ctrlKey && !e.metaKey && !e.altKey && shortcuts[e.key]) {
+    navigate(shortcuts[e.key]);
+  }
+});
 
 // ======= SCROLL NAVBAR EFFECT =======
 window.addEventListener('scroll', () => {
   const nav = document.getElementById('navbar');
-  nav.style.background = window.scrollY > 50
-    ? 'rgba(4,5,15,0.97)'
-    : 'rgba(4,5,15,0.85)';
-});
+  const scrolled = window.scrollY > 50;
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  if (theme === 'dark') {
+    nav.style.background = scrolled ? 'rgba(7,12,24,0.98)' : 'rgba(7,12,24,0.94)';
+  } else {
+    nav.style.background = scrolled ? 'rgba(244,247,252,0.98)' : 'rgba(244,247,252,0.94)';
+  }
+}, { passive: true });
+
+// ======= INIT =======
+handleHashChange();
